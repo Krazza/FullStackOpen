@@ -7,7 +7,8 @@ import Persons from './Persons';
 const App = () => {
     
     const [persons, setPersons] = useState([]);
-    const [filteredPersons, setFilteredPersons] = useState(persons);
+    const [filteredPersons, setFilteredPersons] = useState([]);
+    const [filter, setFilter] = useState("");
     const [newName, setNewName] = useState("");
     const [newNumber, setNewNumber] = useState("");
 
@@ -16,6 +17,14 @@ const App = () => {
         .get("http://localhost:3001/persons")
         .then(response => setPersons(response.data));
     }, []);
+
+    useEffect(()=>{
+        console.log("Updating the filtered array.")
+        setFilteredPersons(persons.filter((person) => {
+            if(filter === "")
+                return person;
+            return person.name.toLocaleLowerCase().includes(filter.toLocaleLowerCase())}));
+    }, [filter, persons]);
 
     const handleNameChange = (event) =>{
         setNewName(event.target.value);
@@ -26,10 +35,8 @@ const App = () => {
     }
 
     const handleFilter = (event) =>{
-        setFilteredPersons(persons.filter((person) => {
-            if(event.target.value === "")
-                return person;
-            return person.name.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase())}));
+        setFilter(event.target.value);
+
     }
 
     const SaveNewPerson = (event) =>{
@@ -54,7 +61,7 @@ const App = () => {
                 break;
             } else{
                 setPersons(persons.concat(newPerson));
-                setFilteredPersons(filteredPersons.concat(newPerson));
+
                 ClearFields(event);
             }
         }
@@ -89,7 +96,7 @@ const App = () => {
         <h2>{"Add a new person"}</h2>
         <NewPersonForm handleNameChange={handleNameChange} SaveNewPerson={SaveNewPerson} handleNumberChange={handleNumberChange}/>
         <h2>{"Numbers"}</h2>
-        <Persons filteredPersons={filteredPersons}/>
+        { filter.length > 0 ? <Persons persons={filteredPersons}/> : <Persons persons={persons}/>}
     </div>)
 }
 

@@ -19,7 +19,6 @@ const App = () => {
     }, []);
 
     useEffect(()=>{
-        console.log("Updating the filtered array.")
         setFilteredPersons(persons.filter((person) => {
             if(filter === "")
                 return person;
@@ -40,9 +39,12 @@ const App = () => {
     }
 
     const handleDeletion = (event, id) =>{
-        numberService
-        .erase(id)
-        .then(setPersons(persons.filter(person => person.id !== id)));
+        if(window.confirm("Do you really wish to delete this user?"))
+        {
+            numberService
+            .erase(id)
+            .then(setPersons(persons.filter(person => person.id !== id)));
+        }
     }
 
     const SaveNewPerson = (event) =>{
@@ -58,27 +60,30 @@ const App = () => {
             number: newNumber
         }
 
-        if(!CheckForDuplicate())
+        if(CheckForPresence())
         {
+            if(window.confirm(`User ${newPerson.name} already exist in the database, do you wish to update the number?`))
+            {
+                numberService
+                .update((persons.find(person => person.name === newPerson.name)).id, newPerson)
+                .then(updatedPerson => setPersons(persons.map(person => person.id !== updatedPerson.id ? person : updatedPerson)));
+                ClearFields(event);
+            }
+            
+        } else {
             numberService
             .create(newPerson)
             .then(updatedPersons => setPersons(persons.concat(updatedPersons)))
             ClearFields(event);
         }
 
-        function CheckForDuplicate() {
-            let isDuplicate;
-            for (let i = 0; i < persons.length; i++) {
-                if (PersonObjectComparison(newPerson, persons[i])) {
-                    isDuplicate = true;
-                    window.alert(`${event.target.value} is already present in the database.`);
-                    ClearFields(event);
-                    break;
-                } else {
-                    isDuplicate = false;
-                }
-            }
-            return isDuplicate;
+        function CheckForPresence() {
+            const target = persons.find((person) => person.name === newPerson.name);
+            if( target===undefined )
+            {
+                return false;
+            } else 
+                return true;
         }
     }
 
@@ -86,21 +91,6 @@ const App = () => {
         setNewName("");
         setNewNumber("");
         event.target.reset();
-    }
-
-    const PersonObjectComparison = (a, b) =>{
-        const personA = Object.getOwnPropertyNames(a);
-        const personB = Object.getOwnPropertyNames(b);
-        
-        //same number of fields
-        if (personA.length !== personB.length) return false;
-        //same fields
-        const hasAllKeys = personA.every(value => !!personB.find(v => v === value));
-        if (!hasAllKeys) return false;
-        //same field values
-        for (const key of personA) if (a[key] !== b[key]) return false;
-
-        return true;
     }
 
     return (

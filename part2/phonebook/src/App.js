@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from "axios";
+import numberService from './services/numbers';
 import Filter from './Filter';
 import NewPersonForm from './NewPersonForm';
 import Persons from './Persons';
@@ -13,9 +13,9 @@ const App = () => {
     const [newNumber, setNewNumber] = useState("");
 
     useEffect(()=>{
-        axios
-        .get("http://localhost:3001/persons")
-        .then(response => setPersons(response.data));
+        numberService
+        .getAll()
+        .then(initialNumbers => setPersons(initialNumbers));
     }, []);
 
     useEffect(()=>{
@@ -39,6 +39,12 @@ const App = () => {
 
     }
 
+    const handleDeletion = (event, id) =>{
+        numberService
+        .erase(id)
+        .then(setPersons(persons.filter(person => person.id !== id)));
+    }
+
     const SaveNewPerson = (event) =>{
         event.preventDefault();
         if(newName === "" || newNumber === "")
@@ -51,19 +57,28 @@ const App = () => {
             name: newName,
             number: newNumber
         }
-        
-        for(let i = 0; i < persons.length; i++)
-        {
-            if(PersonObjectComparison(newPerson, persons[i]))
-            {
-                window.alert(`${event.target.value} is already present in the database.`);
-                ClearFields(event);
-                break;
-            } else{
-                setPersons(persons.concat(newPerson));
 
-                ClearFields(event);
+        if(!CheckForDuplicate())
+        {
+            numberService
+            .create(newPerson)
+            .then(updatedPersons => setPersons(persons.concat(updatedPersons)))
+            ClearFields(event);
+        }
+
+        function CheckForDuplicate() {
+            let isDuplicate;
+            for (let i = 0; i < persons.length; i++) {
+                if (PersonObjectComparison(newPerson, persons[i])) {
+                    isDuplicate = true;
+                    window.alert(`${event.target.value} is already present in the database.`);
+                    ClearFields(event);
+                    break;
+                } else {
+                    isDuplicate = false;
+                }
             }
+            return isDuplicate;
         }
     }
 
@@ -96,7 +111,7 @@ const App = () => {
         <h2>{"Add a new person"}</h2>
         <NewPersonForm handleNameChange={handleNameChange} SaveNewPerson={SaveNewPerson} handleNumberChange={handleNumberChange}/>
         <h2>{"Numbers"}</h2>
-        { filter.length > 0 ? <Persons persons={filteredPersons}/> : <Persons persons={persons}/>}
+        { filter.length > 0 ? <Persons persons={filteredPersons} handleDeletion={handleDeletion}/> : <Persons persons={persons} handleDeletion={handleDeletion}/>}
     </div>)
 }
 

@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import numberService from './services/numbers';
-import Filter from './Filter';
-import NewPersonForm from './NewPersonForm';
-import Persons from './Persons';
+import Filter from './components/Filter';
+import NewPersonForm from './components/NewPersonForm';
+import Persons from './components/Persons';
+import Notification from './components/notification/Notification';
 
 const App = () => {
     
@@ -11,6 +12,7 @@ const App = () => {
     const [filter, setFilter] = useState("");
     const [newName, setNewName] = useState("");
     const [newNumber, setNewNumber] = useState("");
+    const [notification, setNotification] = useState(null);
 
     useEffect(()=>{
         numberService
@@ -66,15 +68,26 @@ const App = () => {
             {
                 numberService
                 .update((persons.find(person => person.name === newPerson.name)).id, newPerson)
-                .then(updatedPerson => setPersons(persons.map(person => person.id !== updatedPerson.id ? person : updatedPerson)));
-                ClearFields(event);
+                .then(updatedPerson => {
+                    setPersons(persons.map(person => person.id !== updatedPerson.id ? person : updatedPerson))
+                    setNotification(`${updatedPerson.name}'s number was updated.`);
+                    setTimeout(() => {
+                        setNotification(null)
+                      }, 3000)
+                    ClearFields(event);});
             }
             
         } else {
             numberService
             .create(newPerson)
-            .then(updatedPersons => setPersons(persons.concat(updatedPersons)))
-            ClearFields(event);
+            .then(updatedPersons => {
+                setPersons(persons.concat(updatedPersons));
+                setNotification(`${newPerson.name} was added to the phonebook.`);
+                setTimeout(() => {
+                    setNotification(null)
+                  }, 3000)
+                ClearFields(event);})
+            
         }
 
         function CheckForPresence() {
@@ -96,6 +109,7 @@ const App = () => {
     return (
     <div>
         <h1>{"Phonebook"}</h1>
+        <Notification message={notification}/>
         <h2>{"Filter by name"}</h2>
         <Filter handleFilter={handleFilter} />
         <h2>{"Add a new person"}</h2>

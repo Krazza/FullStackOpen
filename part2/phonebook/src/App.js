@@ -13,6 +13,7 @@ const App = () => {
     const [newName, setNewName] = useState("");
     const [newNumber, setNewNumber] = useState("");
     const [notification, setNotification] = useState(null);
+    const [errorOccured, setErrorOccured] = useState(false);
 
     useEffect(()=>{
         numberService
@@ -66,15 +67,26 @@ const App = () => {
         {
             if(window.confirm(`User ${newPerson.name} already exist in the database, do you wish to update the number?`))
             {
+                const updateTarget = persons.find(person => person.name === newPerson.name);
                 numberService
-                .update((persons.find(person => person.name === newPerson.name)).id, newPerson)
+                .update(updateTarget.id, newPerson)
                 .then(updatedPerson => {
                     setPersons(persons.map(person => person.id !== updatedPerson.id ? person : updatedPerson))
                     setNotification(`${updatedPerson.name}'s number was updated.`);
                     setTimeout(() => {
                         setNotification(null)
                       }, 3000)
-                    ClearFields(event);});
+                    ClearFields(event);})
+                .catch(error => {
+                    setErrorOccured(true);
+                    setNotification(`${updateTarget.name} was already deleted from the server.`);
+                    setTimeout(() => {
+                        setNotification(null);
+                        setErrorOccured(false);
+                      }, 3000)
+                    setPersons(persons.filter(person => person.id !== updateTarget.id));
+                    ClearFields(event);
+                  });
             }
             
         } else {
@@ -109,7 +121,7 @@ const App = () => {
     return (
     <div>
         <h1>{"Phonebook"}</h1>
-        <Notification message={notification}/>
+        <Notification message={notification} errorOccured={errorOccured}/>
         <h2>{"Filter by name"}</h2>
         <Filter handleFilter={handleFilter} />
         <h2>{"Add a new person"}</h2>
@@ -119,4 +131,4 @@ const App = () => {
     </div>)
 }
 
-export default App
+export default App  

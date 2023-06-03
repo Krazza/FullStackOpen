@@ -7,6 +7,7 @@ function App() {
 	const [countries, setCountries] = useState(null);
 	const [filteredCountries, setFilteredCountries] = useState(null);
 	const [search, setSearch] = useState("");
+	const [chosenCountry, setChosenCountry] = useState(null);
 
 	useEffect(()=>{
 		axios.get("https://studies.cs.helsinki.fi/restcountries/api/all")
@@ -28,6 +29,11 @@ function App() {
 
 	const handleFilter = (event) =>{
 		setSearch(event.target.value);
+		setChosenCountry(null);
+	}
+
+	const handleSingle = (countryName) =>{
+		setChosenCountry(countries.find(country => country.name.common === countryName));
 	}
 
 	if(countries)
@@ -39,15 +45,17 @@ function App() {
 					<h2>{"Look for a country"}</h2>
 					<input type="text" onChange={handleFilter}/>
 				</form>
-				{(filteredCountries !== null && filteredCountries.length > 10) ? 
+				{chosenCountry === null ? 
+				(filteredCountries !== null && filteredCountries.length > 10) ? 
 					<p>{"Too many matches, specify another filter"} </p> 
 					: 
 					(filteredCountries !== null && filteredCountries.length === 1) ? 
 					<Country country={filteredCountries[0]}/> 
 					: 
-					<Countries countries={filteredCountries}/>
+					<Countries countries={filteredCountries} handleSingle={handleSingle}/>
+				: 
+				<Country country={chosenCountry}/>
 				}
-				
 			</div>
 		);
 	}

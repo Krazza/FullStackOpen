@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import countriesService from "./services/CountriesData";
+import weatherSvervice from "./services/WeatherData";
 import Countries from "./Countries";
 import Country from "./Country";
 
@@ -8,25 +9,33 @@ function App() {
 	const [filteredCountries, setFilteredCountries] = useState(null);
 	const [search, setSearch] = useState("");
 	const [chosenCountry, setChosenCountry] = useState(null);
-	const api_key = process.env.REACT_APP_API_KEY
+	const [chosenWeatherData, setChosenWeatherData] = useState(null);
 
 	useEffect(()=>{
-		axios.get("https://studies.cs.helsinki.fi/restcountries/api/all")
-		.then(response => setCountries(response.data));
+		countriesService.getAll().then(response => setCountries(response));
 	}, [])
 
 	useEffect(()=>{
 		if(chosenCountry)
-			axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${chosenCountry.capitalInfo.latlng[0]}&lon=${chosenCountry.capitalInfo.latlng[1]}&appid=${api_key}`)
-			.then(response => console.log(response))
-	}, [chosenCountry, api_key])
+			{
+				weatherSvervice.getBasicOne(chosenCountry.capitalInfo.latlng[0], chosenCountry.capitalInfo.latlng[1])
+				.then(response => {setChosenWeatherData(response)})
+			}
+	}, [chosenCountry])
 
 	useEffect(()=>{
 		if(countries)
 		{
 			if(search !== "")
 			{
-				setFilteredCountries(countries.filter(country => country.name.common.toLocaleLowerCase().includes(search.toLocaleLowerCase())))
+				const filteredData = countries.filter(country => country.name.common.toLocaleLowerCase().includes(search.toLocaleLowerCase()));
+				if(filteredData.length === 1){
+					setFilteredCountries(filteredData);
+					setChosenCountry(filteredData[0]);
+				} else{
+					setFilteredCountries(filteredData);
+				}
+				
 			} else {
 				setFilteredCountries([]);
 			}
@@ -57,11 +66,11 @@ function App() {
 					<p>{"Too many matches, specify another filter"} </p> 
 					: 
 					(filteredCountries !== null && filteredCountries.length === 1) ? 
-					<Country country={filteredCountries[0]}/> 
+					<Country country={filteredCountries[0]} weatherData={chosenWeatherData}/> 
 					: 
 					<Countries countries={filteredCountries} handleSingle={handleSingle}/>
 				: 
-				<Country country={chosenCountry}/>
+				<Country country={chosenCountry} weatherData={chosenWeatherData}/>
 				}
 			</div>
 		);

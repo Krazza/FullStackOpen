@@ -8,11 +8,18 @@ function App() {
 	const [filteredCountries, setFilteredCountries] = useState(null);
 	const [search, setSearch] = useState("");
 	const [chosenCountry, setChosenCountry] = useState(null);
+	const api_key = process.env.REACT_APP_API_KEY
 
 	useEffect(()=>{
 		axios.get("https://studies.cs.helsinki.fi/restcountries/api/all")
 		.then(response => setCountries(response.data));
 	}, [])
+
+	useEffect(()=>{
+		if(chosenCountry)
+			axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${chosenCountry.capitalInfo.latlng[0]}&lon=${chosenCountry.capitalInfo.latlng[1]}&appid=${api_key}`)
+			.then(response => console.log(response))
+	}, [chosenCountry, api_key])
 
 	useEffect(()=>{
 		if(countries)

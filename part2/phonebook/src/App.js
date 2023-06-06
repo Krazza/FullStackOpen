@@ -68,8 +68,9 @@ const App = () => {
             if(window.confirm(`User ${newPerson.name} already exist in the database, do you wish to update the number?`))
             {
                 const updateTarget = persons.find(person => person.name === newPerson.name);
+                updateTarget.number = newPerson.number;
                 numberService
-                .update(updateTarget.id, newPerson)
+                .update(updateTarget.id, updateTarget)
                 .then(updatedPerson => {
                     setPersons(persons.map(person => person.id !== updatedPerson.id ? person : updatedPerson))
                     setNotification(`${updatedPerson.name}'s number was updated.`);
@@ -78,6 +79,7 @@ const App = () => {
                       }, 3000)
                     ClearFields(event);})
                 .catch(error => {
+                    console.log(error)
                     setErrorOccured(true);
                     setNotification(`${updateTarget.name} was already deleted from the server.`);
                     setTimeout(() => {

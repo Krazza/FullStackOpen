@@ -1,6 +1,11 @@
 import axios from "axios";
 
-const baseUrl = "api/persons";
+let baseUrl;
+if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+    baseUrl = "http://localhost:3005/api/persons"
+} else {
+    baseUrl = "api/persons";
+}
 
 const getAll = () => {
     const request = axios.get(baseUrl);

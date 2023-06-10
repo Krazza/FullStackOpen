@@ -101,6 +101,14 @@ const App = () => {
                     setNotification(null)
                   }, 3000)
                 ClearFields(event);})
+            .catch(error => {
+                setErrorOccured(true);
+                setNotification(`${error.response.data.error}`);
+                setTimeout(() => {
+                    setNotification(null);
+                    setErrorOccured(false);
+                    }, 6000)
+            })
             
         }
 

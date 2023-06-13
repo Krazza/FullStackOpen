@@ -36,9 +36,23 @@ const mostBlogs = (blogs) => {
     return result;
 }
 
+const mostLikes = (blogs) => {
+    const authors = blogs.map(blog => blog.author);
+    const numberOfLikes = blogs.map(blog => blog.likes);
+
+    const mostLikesIndex = numberOfLikes.indexOf(Math.max(...numberOfLikes));
+    const result = {
+        author : authors[mostLikesIndex],
+        likes : numberOfLikes[mostLikesIndex]
+    }
+
+    return result;
+}
+
 module.exports = {
     dummy,
     totalLikes,
     favouriteBlog,
-    mostBlogs
+    mostBlogs,
+    mostLikes
 }

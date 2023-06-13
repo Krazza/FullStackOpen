@@ -104,3 +104,53 @@ describe("most blogs", () => {
         expect(author).toEqual(topAuthor);
     })
 })
+
+describe("most likes", () => {
+    const blogList = [
+        {
+            title: "Clever books",
+            author: "Stephen King",
+            url: "https://king.com",
+            likes: 142,
+            id: "648877f91e22a33a46c0fb27"
+        },
+        {
+            title: "Tasty fruits_01",
+            author: "Kevin",
+            url: "https://kevinsfruits.com",
+            likes: 21,
+            id: "148177f99e92a32a46c0fb23"
+        },
+        {
+            title: "Tasty fruits_02",
+            author: "Kevin",
+            url: "https://kevinsfruits.com",
+            likes: 5,
+            id: "183877f99e92a32a46c0fb23"
+        },
+        {
+            title: "Tasty fruits_03",
+            author: "Kevin",
+            url: "https://kevinsfruits.com",
+            likes: 4,
+            id: "142577f99e92a32a46c0fb23"
+        },
+        {
+            title: "Valorant guides",
+            author: "SEN TENZ",
+            url: "https://sentenzguides.com",
+            likes: 5000,
+            id: "648877f99e92a32a46c0fb27"
+        }
+    ]
+
+    const topAuthor = {
+        author : "SEN TENZ",
+        likes : 5000
+    }
+
+    test("finds and compares the author with most likes", () => {
+        const author = listHelper.mostLikes(blogList);
+        expect(author).toEqual(topAuthor);
+    })
+})

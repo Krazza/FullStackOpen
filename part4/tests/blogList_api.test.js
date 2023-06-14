@@ -23,3 +23,14 @@ test("get the correct number of blogs in the correct format", async () => {
 
     expect(response.body.length).toBe(3);
 })
+
+test("objects are identified by id", async () => {
+    const response = await api
+    .get("/api/bloglist")
+    .expect(200)
+    
+    const blogs = response.body;
+    for(let blog of blogs) {
+        expect(blog.id).toBeDefined();
+    }
+})

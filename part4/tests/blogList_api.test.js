@@ -34,3 +34,26 @@ test("objects are identified by id", async () => {
         expect(blog.id).toBeDefined();
     }
 })
+
+test("blog being saved successfully", async () => {
+    const blogsAtTheStart = helper.initialBlogs;
+    const newBlog = {
+        title: "Diablo 4 guides",
+        author: "Quin69",
+        url: "https://www.twitch.tv/quin69",
+        likes: 772003,
+        id: "648577f99e92a32a46c0cb27"
+    }
+
+    await api
+    .post("/api/bloglist")
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+    const notesAtTheEnd = await helper.blogsInDB();
+    expect(notesAtTheEnd).toHaveLength(blogsAtTheStart.length + 1);
+
+    const titles = notesAtTheEnd.map(blog => blog.title);
+    expect(titles).toContain("Diablo 4 guides");
+})

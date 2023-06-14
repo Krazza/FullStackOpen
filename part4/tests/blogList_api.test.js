@@ -51,9 +51,32 @@ test("blog being saved successfully", async () => {
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
-    const notesAtTheEnd = await helper.blogsInDB();
-    expect(notesAtTheEnd).toHaveLength(blogsAtTheStart.length + 1);
+    const blogsAtTheEnd = await helper.blogsInDB();
+    expect(blogsAtTheEnd).toHaveLength(blogsAtTheStart.length + 1);
 
-    const titles = notesAtTheEnd.map(blog => blog.title);
+    const titles = blogsAtTheEnd.map(blog => blog.title);
     expect(titles).toContain("Diablo 4 guides");
+})
+
+test("every blog has to have likes", async () => {
+    const blogsAtTheStart = helper.initialBlogs;
+    const newBlog = {
+        title: "Path of Exile guides",
+        author: "Quin69",
+        url: "https://www.twitch.tv/quin69",
+        id: "648577f99e64a32a46c0cb17"
+    }
+
+    await api
+    .post("/api/bloglist")
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+    const blogsAtTheEnd = await helper.blogsInDB();
+    expect(blogsAtTheEnd).toHaveLength(blogsAtTheStart.length + 1);
+
+    for(let blog of blogsAtTheEnd) {
+        expect(blog).toHaveProperty("likes");
+    }
 })

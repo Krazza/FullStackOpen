@@ -80,3 +80,43 @@ test("every blog has to have likes", async () => {
         expect(blog).toHaveProperty("likes");
     }
 })
+
+test("a blog without a title is not added", async () => {
+    const blogsAtTheStart = helper.initialBlogs;
+    const newBlog = {
+        author: "Quin69",
+        url: "https://www.twitch.tv/quin69",
+        id: "648577f94e61a32a56c0cb17"
+    }
+
+    await api
+    .post("/api/bloglist")
+    .send(newBlog)
+    .expect(400)
+    .expect('Content-Type', /application\/json/)
+
+    const blogsAtTheEnd = await helper.blogsInDB();
+    expect(blogsAtTheEnd).toHaveLength(blogsAtTheStart.length);
+})
+
+test("a blog without a url is not added", async () => {
+    const blogsAtTheStart = helper.initialBlogs;
+    const newBlog = {
+        title: "Path of Exile 2 guides",
+        author: "Quin69",
+        id: "648577f94e61a32a56c0cb22"
+    }
+
+    await api
+    .post("/api/bloglist")
+    .send(newBlog)
+    .expect(400)
+    .expect('Content-Type', /application\/json/)
+
+    const blogsAtTheEnd = await helper.blogsInDB();
+    expect(blogsAtTheEnd).toHaveLength(blogsAtTheStart.length);
+})
+
+afterAll(async () => {
+    await mongoose.connection.close()
+})

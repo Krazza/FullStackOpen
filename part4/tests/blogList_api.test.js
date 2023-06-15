@@ -14,108 +14,142 @@ beforeEach(async () => {
     const promiseArray = blogObjects.map(blog => blog.save());
     await Promise.all(promiseArray);
 })
-
-test("get the correct number of blogs in the correct format", async () => {
-    const response = await api
-    .get("/api/bloglist")
-    .expect(200)
-    .expect("Content-Type", /application\/json/)
-
-    expect(response.body.length).toBe(3);
-})
-
-test("objects are identified by id", async () => {
-    const response = await api
-    .get("/api/bloglist")
-    .expect(200)
+describe("blogs are in a correct format", () => {
+    test("get the correct number of blogs in the correct format", async () => {
+        const response = await api
+        .get("/api/bloglist")
+        .expect(200)
+        .expect("Content-Type", /application\/json/)
     
-    const blogs = response.body;
-    for(let blog of blogs) {
-        expect(blog.id).toBeDefined();
-    }
+        expect(response.body.length).toBe(3);
+    })
+    
+    test("objects are identified by id", async () => {
+        const response = await api
+        .get("/api/bloglist")
+        .expect(200)
+        
+        const blogs = response.body;
+        for(let blog of blogs) {
+            expect(blog.id).toBeDefined();
+        }
+    })
+    
+    test("every blog has to have likes", async () => {
+        const blogsAtTheStart = helper.initialBlogs;
+        const newBlog = {
+            title: "Path of Exile guides",
+            author: "Quin69",
+            url: "https://www.twitch.tv/quin69",
+        }
+    
+        await api
+        .post("/api/bloglist")
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+    
+        const blogsAtTheEnd = await helper.blogsInDB();
+        expect(blogsAtTheEnd).toHaveLength(blogsAtTheStart.length + 1);
+    
+        for(let blog of blogsAtTheEnd) {
+            expect(blog).toHaveProperty("likes");
+        }
+    })
 })
 
-test("blog being saved successfully", async () => {
-    const blogsAtTheStart = helper.initialBlogs;
-    const newBlog = {
-        title: "Diablo 4 guides",
-        author: "Quin69",
-        url: "https://www.twitch.tv/quin69",
-        likes: 772003,
-        id: "648577f99e92a32a46c0cb27"
-    }
+describe("addition of a blog", () => {
+    test("blog being saved successfully", async () => {
+        const blogsAtTheStart = helper.initialBlogs;
+        const newBlog = {
+            title: "Diablo 4 guides",
+            author: "Quin69",
+            url: "https://www.twitch.tv/quin69",
+            likes: 772003,
+        }
+    
+        await api
+        .post("/api/bloglist")
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+    
+        const blogsAtTheEnd = await helper.blogsInDB();
+        expect(blogsAtTheEnd).toHaveLength(blogsAtTheStart.length + 1);
+    
+        const titles = blogsAtTheEnd.map(blog => blog.title);
+        expect(titles).toContain("Diablo 4 guides");
+    })
 
-    await api
-    .post("/api/bloglist")
-    .send(newBlog)
-    .expect(201)
-    .expect('Content-Type', /application\/json/)
-
-    const blogsAtTheEnd = await helper.blogsInDB();
-    expect(blogsAtTheEnd).toHaveLength(blogsAtTheStart.length + 1);
-
-    const titles = blogsAtTheEnd.map(blog => blog.title);
-    expect(titles).toContain("Diablo 4 guides");
+    test("a blog without a title is not added", async () => {
+        const blogsAtTheStart = helper.initialBlogs;
+        const newBlog = {
+            author: "Quin69",
+            url: "https://www.twitch.tv/quin69",
+        }
+    
+        await api
+        .post("/api/bloglist")
+        .send(newBlog)
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+    
+        const blogsAtTheEnd = await helper.blogsInDB();
+        expect(blogsAtTheEnd).toHaveLength(blogsAtTheStart.length);
+    })
+    
+    test("a blog without a url is not added", async () => {
+        const blogsAtTheStart = helper.initialBlogs;
+        const newBlog = {
+            title: "Path of Exile 2 guides",
+            author: "Quin69",
+        }
+    
+        await api
+        .post("/api/bloglist")
+        .send(newBlog)
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+    
+        const blogsAtTheEnd = await helper.blogsInDB();
+        expect(blogsAtTheEnd).toHaveLength(blogsAtTheStart.length);
+    })
 })
 
-test("every blog has to have likes", async () => {
-    const blogsAtTheStart = helper.initialBlogs;
-    const newBlog = {
-        title: "Path of Exile guides",
-        author: "Quin69",
-        url: "https://www.twitch.tv/quin69",
-        id: "648577f99e64a32a46c0cb17"
-    }
+describe("deletion of a blog", () => {
+    test("successful deletion with valid data", async () => {
+        const blogsAtTheStart = await helper.blogsInDB();
+        const blogToDelete = blogsAtTheStart[0];
+    
+        await api
+        .delete(`/api/bloglist/${blogToDelete.id}`)
+        .expect(204)
+    
+        const blogsAtTheEnd = await helper.blogsInDB();
+        expect(blogsAtTheEnd).toHaveLength(blogsAtTheStart.length - 1);
+    
+        const titles = blogsAtTheEnd.map(blog => blog.title);
+        expect(titles).not.toContain(blogToDelete.title)
+    })
 
-    await api
-    .post("/api/bloglist")
-    .send(newBlog)
-    .expect(201)
-    .expect('Content-Type', /application\/json/)
-
-    const blogsAtTheEnd = await helper.blogsInDB();
-    expect(blogsAtTheEnd).toHaveLength(blogsAtTheStart.length + 1);
-
-    for(let blog of blogsAtTheEnd) {
-        expect(blog).toHaveProperty("likes");
-    }
+    test("failed deletion with non existing ID", async () => {
+        const blogsAtTheStart = await helper.blogsInDB();
+        const id = await helper.nonExistingId();
+    
+        await api
+        .delete(`/api/bloglist/${id}`)
+        .expect(204)
+    
+        const blogsAtTheEnd = await helper.blogsInDB();
+        expect(blogsAtTheEnd).toHaveLength(blogsAtTheStart.length);
+    })
 })
 
-test("a blog without a title is not added", async () => {
-    const blogsAtTheStart = helper.initialBlogs;
-    const newBlog = {
-        author: "Quin69",
-        url: "https://www.twitch.tv/quin69",
-        id: "648577f94e61a32a56c0cb17"
-    }
+// describe("update of a blog", () => {
+//     test("successful update of the info of an individual blog", async () => {
 
-    await api
-    .post("/api/bloglist")
-    .send(newBlog)
-    .expect(400)
-    .expect('Content-Type', /application\/json/)
-
-    const blogsAtTheEnd = await helper.blogsInDB();
-    expect(blogsAtTheEnd).toHaveLength(blogsAtTheStart.length);
-})
-
-test("a blog without a url is not added", async () => {
-    const blogsAtTheStart = helper.initialBlogs;
-    const newBlog = {
-        title: "Path of Exile 2 guides",
-        author: "Quin69",
-        id: "648577f94e61a32a56c0cb22"
-    }
-
-    await api
-    .post("/api/bloglist")
-    .send(newBlog)
-    .expect(400)
-    .expect('Content-Type', /application\/json/)
-
-    const blogsAtTheEnd = await helper.blogsInDB();
-    expect(blogsAtTheEnd).toHaveLength(blogsAtTheStart.length);
-})
+//     })
+// })
 
 afterAll(async () => {
     await mongoose.connection.close()

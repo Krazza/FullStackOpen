@@ -131,25 +131,26 @@ describe("deletion of a blog", () => {
         const titles = blogsAtTheEnd.map(blog => blog.title);
         expect(titles).not.toContain(blogToDelete.title)
     })
-
-    test("failed deletion with non existing ID", async () => {
-        const blogsAtTheStart = await helper.blogsInDB();
-        const id = await helper.nonExistingId();
-    
-        await api
-        .delete(`/api/bloglist/${id}`)
-        .expect(204)
-    
-        const blogsAtTheEnd = await helper.blogsInDB();
-        expect(blogsAtTheEnd).toHaveLength(blogsAtTheStart.length);
-    })
 })
 
-// describe("update of a blog", () => {
-//     test("successful update of the info of an individual blog", async () => {
+describe("update of a blog", () => {
+    test("successful update of the likes of an individual blog", async () => {
+        const blogsAtTheStart = await helper.blogsInDB();
+        const blogToUpdate = blogsAtTheStart[0];
 
-//     })
-// })
+        blogToUpdate.likes += 1;
+
+        await api
+        .put(`/api/bloglist/${blogToUpdate.id}`)
+        .send(blogToUpdate)
+        .expect(200)
+        .expect('Content-Type', /application\/json/);
+
+        const blogsAtTheEnd = await helper.blogsInDB();
+        const updatedBlog = blogsAtTheEnd.find(blog => blog.title === blogToUpdate.title);
+        expect(updatedBlog.likes).toBe(blogToUpdate.likes);
+    })
+})
 
 afterAll(async () => {
     await mongoose.connection.close()

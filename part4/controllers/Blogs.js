@@ -1,24 +1,36 @@
 const blogsRouter = require("express").Router();
 const { default: mongoose } = require("mongoose");
 const { Blog } = require("../models/Blog");
+const { User } = require("../models/user");
 
 blogsRouter.get('/', async (request, response) => {
-    const blogs = await Blog.find({});
+    const blogs = await Blog.find({}).populate("user", { name : 1});
     response.json(blogs);
 })
   
 blogsRouter.post('/', async (request, response) => {
-    const blog = new Blog(request.body)
+    const body = request.body;
 
     if(!request.body.title) {
         response.status(400).send({ error: 'missing title' });
     } else if(!request.body.url) {
         response.status(400).send({ error: 'missing url' });
     } else {
+        const users = await User.find({});
+        const blog = new Blog({
+            title : body.title,
+            author : body.author,
+            url : body.url,
+            likes : body.likes,
+            user : users[0].id
+        })
+
         if(!(Object.hasOwn(request.body, "likes"))) {
             blog["likes"] = 0;
         }
         const savedBlog = await blog.save();
+        users[0].blogs = users[0].blogs.concat(savedBlog._id);
+        await users[0].save();
         response.status(201).json(savedBlog)
     }
 })

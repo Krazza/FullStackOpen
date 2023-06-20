@@ -29,7 +29,7 @@ blogsRouter.post('/', async (request, response) => {
     } else if(!request.body.url) {
         response.status(400).send({ error: 'missing url' });
     } else {
-        const user = await User.findById(decodedToken.id);
+        const user = request.user;
         const blog = new Blog({
             title : body.title,
             author : body.author,
@@ -49,11 +49,9 @@ blogsRouter.post('/', async (request, response) => {
 })
 
 blogsRouter.delete("/:id", async (request, response) => {
-    const decodedToken = jwt.verify(request.token, process.env.SECRET);
-    const user = await User.findById(decodedToken.id);
     const blog = await Blog.findById(request.params.id);
+    const user = request.user;
 
-    console.log(user.id.toString(), blog.user.toString())
     if(user.id.toString() === blog.user.toString()) {
         await Blog.findByIdAndRemove(request.params.id);
     } else {

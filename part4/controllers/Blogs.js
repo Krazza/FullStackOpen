@@ -4,14 +4,6 @@ const { default: mongoose } = require("mongoose");
 const { Blog } = require("../models/Blog");
 const { User } = require("../models/user");
 
-// const getTokenFrom = request => {
-//     const authorization = request.get("authorization");
-//     if(authorization && authorization.startsWith("Bearer ")) {
-//         return authorization.replace("Bearer ", "");
-//     }
-//     return null;
-// }
-
 blogsRouter.get('/', async (request, response) => {
     const blogs = await Blog.find({}).populate("user", { name : 1});
     response.json(blogs);

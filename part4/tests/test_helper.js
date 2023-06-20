@@ -1,6 +1,9 @@
 const { Blog } = require("../models/Blog");
 const { User } = require("../models/user");
 
+
+const testToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJpZCI6IjY0OTFkZTIzMjBiNGMwYzkyNTBhYzQyOSIsImlhdCI6MTY4NzI4NDAzOX0.v9dE9QyogpAAL8eJ89tc0PUg2l5wkgaD4HgHk0uUdZ0";
+
 const initialBlogs = [
     {
         title: "Clever books",
@@ -20,7 +23,7 @@ const initialBlogs = [
         title: "Valorant guides",
         author: "SEN TENZ",
         url: "https://sentenzguides.com",
-        likes: 5000,
+        likes: 5000, 
         id: "648877f99e92a32a46c0fb27"
     }
 ];
@@ -43,9 +46,11 @@ const usersInDB = async () => {
     return users.map(user => user.toJSON())
 }
 
+
 module.exports = {
     initialBlogs,
     blogsInDB,
     nonExistingId,
-    usersInDB
+    usersInDB,
+    testToken
 }

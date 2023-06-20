@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const supertest = require("supertest");
+const jwt = require("jsonwebtoken");
 const helper = require("../tests/test_helper");
 const { Blog } = require("../models/Blog");
 const app = require("../app");
@@ -16,8 +17,10 @@ beforeEach(async () => {
 })
 describe("blogs are in a correct format", () => {
     test("get the correct number of blogs in the correct format", async () => {
+
         const response = await api
         .get("/api/bloglist")
+        .set("Authorization", helper.testToken)
         .expect(200)
         .expect("Content-Type", /application\/json/)
     
@@ -27,6 +30,7 @@ describe("blogs are in a correct format", () => {
     test("objects are identified by id", async () => {
         const response = await api
         .get("/api/bloglist")
+        .set("Authorization", helper.testToken)
         .expect(200)
         
         const blogs = response.body;
@@ -37,14 +41,19 @@ describe("blogs are in a correct format", () => {
     
     test("every blog has to have likes", async () => {
         const blogsAtTheStart = helper.initialBlogs;
+        const token =  helper.testToken.replace("Bearer ", "")
+        const decodedToken = jwt.verify(token, process.env.SECRET);
+
         const newBlog = {
             title: "Path of Exile guides",
             author: "Quin69",
             url: "https://www.twitch.tv/quin69",
+            user: decodedToken.id
         }
     
         await api
         .post("/api/bloglist")
+        .set("Authorization", helper.testToken)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -67,9 +76,10 @@ describe("addition of a blog", () => {
             url: "https://www.twitch.tv/quin69",
             likes: 772003,
         }
-    
+
         await api
         .post("/api/bloglist")
+        .set("Authorization", helper.testToken)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -90,6 +100,7 @@ describe("addition of a blog", () => {
     
         await api
         .post("/api/bloglist")
+        .set("Authorization", helper.testToken)
         .send(newBlog)
         .expect(400)
         .expect('Content-Type', /application\/json/)
@@ -107,6 +118,7 @@ describe("addition of a blog", () => {
     
         await api
         .post("/api/bloglist")
+        .set("Authorization", helper.testToken)
         .send(newBlog)
         .expect(400)
         .expect('Content-Type', /application\/json/)
@@ -119,14 +131,31 @@ describe("addition of a blog", () => {
 describe("deletion of a blog", () => {
     test("successful deletion with valid data", async () => {
         const blogsAtTheStart = await helper.blogsInDB();
-        const blogToDelete = blogsAtTheStart[0];
-    
+        const token =  helper.testToken.replace("Bearer ", "")
+        const decodedToken = jwt.verify(token, process.env.SECRET);
+
+        const newBlog = {
+            title: "test",
+            author: "test",
+            url : "test"
+        }
+
+        await api
+        .post("/api/bloglist")
+        .set("Authorization", helper.testToken)
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+        const blogToDelete = await Blog.findOne({user : decodedToken.id});
+
         await api
         .delete(`/api/bloglist/${blogToDelete.id}`)
+        .set("Authorization", helper.testToken)
         .expect(204)
     
         const blogsAtTheEnd = await helper.blogsInDB();
-        expect(blogsAtTheEnd).toHaveLength(blogsAtTheStart.length - 1);
+        expect(blogsAtTheEnd).toHaveLength(blogsAtTheStart.length);
     
         const titles = blogsAtTheEnd.map(blog => blog.title);
         expect(titles).not.toContain(blogToDelete.title)
@@ -142,6 +171,7 @@ describe("update of a blog", () => {
 
         await api
         .put(`/api/bloglist/${blogToUpdate.id}`)
+        .set("Authorization", helper.testToken)
         .send(blogToUpdate)
         .expect(200)
         .expect('Content-Type', /application\/json/);

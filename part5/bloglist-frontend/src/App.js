@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import Notification from './components/notification/Notification'
 
 const App = () => {
 
@@ -14,6 +15,9 @@ const [blogs, setBlogs] = useState([]);
 const [user, setUser] = useState(null);
 const [username, setUsername] = useState("");
 const [password, setPassword] = useState("");
+
+const [notification, setNotification] = useState(null);
+const [errorOccured, setErrorOccured] = useState(false);
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -30,8 +34,10 @@ const [password, setPassword] = useState("");
     }
   }, [])
 
-  const handleLogout = () => {
+  const handleLogout = (event) => {
+    event.preventDefault();
     window.localStorage.removeItem("loggedInBlogAppUser");
+    setUser(null);
   }
 
   const handleLogin = async (event) => {
@@ -44,9 +50,21 @@ const [password, setPassword] = useState("");
 
         blogService.setToken(user.token);
         setUser(user);
+        setNotification(`Welcome ${user.name}!`)
+        setTimeout(() => {
+            setNotification(null);
+            setErrorOccured(false);
+            }, 6000)
+        setErrorOccured(false);
         setUsername("");
         setPassword("");
     } catch (exception) {
+        setNotification(`Wrong credentials!`)
+        setErrorOccured(true);
+        setTimeout(() => {
+            setNotification(null);
+            setErrorOccured(false);
+            }, 6000)
         console.log("WRONG CREDENTIALS", exception)
     }
   }
@@ -81,10 +99,20 @@ const [password, setPassword] = useState("");
     try{
         const response = await blogService.create(newBlog);
         console.log(response);
+        setNotification(`A new blog created by ${author}!`);
+        setTimeout(() => {
+            setNotification(null);
+            setErrorOccured(false);
+            }, 6000)
+        setErrorOccured(false);
         setAuthor("");
         setTitle("");
         setUrl("");
         setLikes(null);
+
+        
+
+        
     } catch(exception)
     {
         console.log("didn't publish")
@@ -122,6 +150,7 @@ const [password, setPassword] = useState("");
 
   return (
     <div>
+        <Notification message={notification} errorOccured={errorOccured}/>
         { user === null ? loginForm() 
         : 
         <div>

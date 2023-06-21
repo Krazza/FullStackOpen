@@ -70,6 +70,25 @@ const [password, setPassword] = useState("");
 
   const handleNewBlog = async (event) => {
     event.preventDefault();
+    
+    const newBlog = {
+        title : title,
+        author : author,
+        url : url,
+        likes : likes
+    }
+    
+    try{
+        const response = await blogService.create(newBlog);
+        console.log(response);
+        setAuthor("");
+        setTitle("");
+        setUrl("");
+        setLikes(null);
+    } catch(exception)
+    {
+        console.log("didn't publish")
+    }
   }
 
   const blogForm = () => {

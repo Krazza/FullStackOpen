@@ -17,13 +17,15 @@ const [password, setPassword] = useState("");
 const [notification, setNotification] = useState(null);
 const [errorOccured, setErrorOccured] = useState(false);
 
+const [udpt, setUpdt] = useState(0);
+
 const blogFormRef = useRef();
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
     )  
-  }, [user])
+  }, [user, udpt])
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedInBlogAppUser");
@@ -96,6 +98,7 @@ const blogFormRef = useRef();
     try{
       blogFormRef.current.toggleVisibility();
       const response = await blogService.create(blogObject);
+      const tempUpdt = udpt + 1;
       setBlogs(blogs.concat(response));
       setNotification(`A new blog created by ${response.author}!`);
       setTimeout(() => {
@@ -103,10 +106,12 @@ const blogFormRef = useRef();
           setErrorOccured(false);
           }, 6000)
       setErrorOccured(false);
-    } catch(exception) {
-        console.log(exception)
+      setUpdt(tempUpdt);
+    } catch(error) {
+        console.log(error)
     }
   }
+
 
   return (
     <div>
@@ -118,9 +123,7 @@ const blogFormRef = useRef();
             <button onClick={handleLogout}>{"log out"}</button>
             {blogForm()}
             <h2>{"blogs"}</h2>
-            {blogs.map(blog =>
-                <Blog key={blog.id} blog={blog} />
-            )}
+            {blogs.map(blog =><Blog key={blog.id} blog={blog}/>)}
         </div>}
     </div>
   )

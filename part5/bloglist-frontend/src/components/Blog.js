@@ -33,6 +33,7 @@ const Blog = ({blog}) => {
       <p>{"AUTHOR : "}{blog.author}</p>
       <p>{"URL : "}{blog.url}</p>
       <p style={inlineStyle}>{"LIKES : "}{blog.likes}</p><button style={buttonStyle}>{"like"}</button>
+      <p>{`Added by: ${blog.user.name}`}</p>
     </div>
     :
     <div>

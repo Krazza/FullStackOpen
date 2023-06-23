@@ -53,15 +53,22 @@ blogsRouter.delete("/:id", middleware.userExtractor, async (request, response) =
     response.status(204).end();
 })
 
-blogsRouter.put("/:id", async (request, response) => {
-    const blog = request.body;
+blogsRouter.put("/:id", middleware.userExtractor, async (request, response) => {
+    const body = request.body;
+    const decodedToken = jwt.verify(request.token, process.env.SECRET);
+    if(!decodedToken.id) {
+        return response.status(401).json({ error : "token invalid"})
+    }
 
-    if(!request.body.title) {
+    if(!body.title) {
         response.status(400).send({ error: 'missing title' });
-    } else if(!request.body.url) {
+    } else if(!body.url) {
         response.status(400).send({ error: 'missing url' });
     } else {
-        const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, { new : true })
+        const user = request.user;
+        const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, body, { new : true })
+        user.blogs = user.blogs.concat(updatedBlog._id);
+        await user.save();
         response.status(200).json(updatedBlog);
     }
 })

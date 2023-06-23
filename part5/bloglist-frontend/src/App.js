@@ -112,6 +112,26 @@ const blogFormRef = useRef();
     }
   }
 
+  const updateBlog = async (blogObject) => {
+    try {
+      const response = await blogService.update(blogObject);
+      const tempUpdt = udpt + 1;
+      setBlogs(blogs.filter(blog => { 
+        if(blog.id === response.id)
+          return response;
+        else
+          return blog
+      }))
+      setNotification(`Successfully updated blog ${response.title}!`);
+      setTimeout(() => {
+          setNotification(null);
+          setErrorOccured(false);
+          }, 6000)
+      setUpdt(tempUpdt);
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   return (
     <div>
@@ -123,7 +143,7 @@ const blogFormRef = useRef();
             <button onClick={handleLogout}>{"log out"}</button>
             {blogForm()}
             <h2>{"blogs"}</h2>
-            {blogs.map(blog =><Blog key={blog.id} blog={blog}/>)}
+            {blogs.map(blog =><Blog key={blog.id} blog={blog} updateBlog={updateBlog}/>)}
         </div>}
     </div>
   )

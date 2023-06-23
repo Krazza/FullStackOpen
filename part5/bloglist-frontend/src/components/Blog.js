@@ -1,12 +1,29 @@
 import React, { useState } from "react";
 
-const Blog = ({blog}) => {
+const Blog = ({blog, updateBlog}) => {
 
   const [showDetails, setShowDetails] = useState(false);
 
   const handleToggle = (event) => {
     event.preventDefault();
     setShowDetails(!showDetails);
+  }
+
+  const handleLike = async (event) => {
+    event.preventDefault();
+    try{
+      const updatedBlog = {
+        title : blog.title,
+        author : blog.author,
+        url : blog.url,
+        likes : blog.likes + 1,
+        user : blog.user.id,
+        id: blog.id
+      }
+      await updateBlog(updatedBlog)
+    } catch(error) {
+      console.log(error)
+    }
   }
 
   const inlineStyle = {
@@ -32,7 +49,7 @@ const Blog = ({blog}) => {
       <h4 style={inlineStyle}>{blog.title}</h4>{showDetails && <button style={buttonStyle} onClick={handleToggle}>{"hide"}</button>}
       <p>{"AUTHOR : "}{blog.author}</p>
       <p>{"URL : "}{blog.url}</p>
-      <p style={inlineStyle}>{"LIKES : "}{blog.likes}</p><button style={buttonStyle}>{"like"}</button>
+      <p style={inlineStyle}>{"LIKES : "}{blog.likes}</p><button style={buttonStyle} onClick={handleLike}>{"like"}</button>
       <p>{`Added by: ${blog.user.name}`}</p>
     </div>
     :

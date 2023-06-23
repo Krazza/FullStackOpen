@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const Blog = ({blog, updateBlog}) => {
+const Blog = ({blog, updateBlog, removeBlog, owner}) => {
 
   const [showDetails, setShowDetails] = useState(false);
 
@@ -23,6 +23,18 @@ const Blog = ({blog, updateBlog}) => {
       await updateBlog(updatedBlog)
     } catch(error) {
       console.log(error)
+    }
+  }
+
+  const handleRemoval = async (event) => {
+    event.preventDefault();
+    if(window.confirm(`Do you really want to remove blog ${blog.title} by ${blog.author}?`))
+    {
+      try {
+        await removeBlog(blog.id)
+      } catch(error) {
+        console.log(error)
+      }
     }
   }
 
@@ -56,6 +68,7 @@ const Blog = ({blog, updateBlog}) => {
     <div>
       <h4 style={inlineStyle}>{blog.title}</h4>{!showDetails && <button style={buttonStyle} onClick={handleToggle}>{"view"}</button>}
     </div>}
+    {(blog.user.name === owner) && <button onClick={handleRemoval}>{"remove"}</button>}
   </div>)  
 }
 

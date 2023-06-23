@@ -133,6 +133,22 @@ const blogFormRef = useRef();
     }
   }
 
+  const removeBlog = async (id) => {
+    try{
+      await blogService.removeOne(id);
+      const tempUpdt = udpt + 1;
+      setBlogs(blogs.filter(blog => blog.id !== id))
+      setNotification(`Successfully removed a blog`);
+      setTimeout(() => {
+          setNotification(null);
+          setErrorOccured(false);
+          }, 6000)
+      setUpdt(tempUpdt);
+    } catch(error){
+      console.log(error)
+    }
+  }
+
   return (
     <div>
         <Notification message={notification} errorOccured={errorOccured}/>
@@ -143,7 +159,7 @@ const blogFormRef = useRef();
             <button onClick={handleLogout}>{"log out"}</button>
             {blogForm()}
             <h2>{"blogs"}</h2>
-            {blogs.map(blog =><Blog key={blog.id} blog={blog} updateBlog={updateBlog}/>)}
+            {blogs.map(blog =><Blog key={blog.id} blog={blog} updateBlog={updateBlog} removeBlog={removeBlog} owner={user.name}/>)}
         </div>}
     </div>
   )

@@ -48,5 +48,16 @@ describe("<Blog />", () => {
         
         screen.debug();
     })
+
+    test("clicking like button twice calls event handler twice", async () => {
+        const user = userEvent.setup();
+        const expandButton = container.querySelector(".blogExpandButton");
+        await user.click(expandButton);
+
+        const likeButton = screen.getByText("like");
+        await user.dblClick(likeButton);
+
+        expect(updateBlog.mock.calls).toHaveLength(2)
+    })
 })
 

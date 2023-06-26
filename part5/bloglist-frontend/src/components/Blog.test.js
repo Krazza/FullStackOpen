@@ -1,6 +1,7 @@
 import React from "react";
 import "@testing-library/jest-dom/extend-expect";
 import { render, screen } from "@testing-library/react";
+import  userEvent from "@testing-library/user-event";
 import Blog from "./Blog";
 
 describe("<Blog />", () => {
@@ -34,6 +35,18 @@ describe("<Blog />", () => {
         const blogLikes = screen.queryByText(2235);
         expect(blogUrl).toBeNull();
         expect(blogLikes).toBeNull();
+    })
+
+    test("showing likes and url after clicking the button", async () => {
+        const user = userEvent.setup();
+        const button = container.querySelector(".blogExpandButton");
+
+        await user.click(button);
+
+        const blogUrl = screen.getByText("www.Facebook.com" , { exact : false });
+        const blogLikes = screen.getByText(2235 , { exact : false });
+        
+        screen.debug();
     })
 })
 

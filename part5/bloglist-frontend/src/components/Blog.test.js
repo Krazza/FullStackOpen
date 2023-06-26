@@ -45,8 +45,7 @@ describe("<Blog />", () => {
 
         const blogUrl = screen.getByText("www.Facebook.com" , { exact : false });
         const blogLikes = screen.getByText(2235 , { exact : false });
-        
-        screen.debug();
+
     })
 
     test("clicking like button twice calls event handler twice", async () => {
@@ -57,7 +56,7 @@ describe("<Blog />", () => {
         const likeButton = screen.getByText("like");
         await user.dblClick(likeButton);
 
-        expect(updateBlog.mock.calls).toHaveLength(2)
+        expect(updateBlog.mock.calls).toHaveLength(2);
     })
 })
 

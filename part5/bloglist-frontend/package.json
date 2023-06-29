@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "axios": "^1.2.3",
+    "cypress": "^12.16.0",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -15,7 +16,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "eslint": "eslint ./src --fix"
+    "eslint": "eslint ./src --fix",
+    "cypress:open": "cypress open"
   },
   "eslintConfig": {
     "extends": [

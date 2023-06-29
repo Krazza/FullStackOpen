@@ -41,4 +41,26 @@ describe('Blog app', function() {
         .and("have.css", "color", "rgb(255, 0, 0)");
     })
   })
+
+  describe("When logged in", function () {
+    beforeEach(function () {
+      cy.login({username: "kev", password: "kappa123"})
+    })
+
+    it("user can add a new blog", function () {
+      cy.contains("new blog").click();
+
+      cy.get(".newBlogTitle").type("Mistborn");
+      cy.get(".newBlogAuthor").type("Brandon Sanderson");
+      cy.get(".newBlogUrl").type("http://FictionalSanderson.com");
+      cy.get(".newBlogLikes").type("5000");
+
+      cy.contains("add").click();
+
+      cy.get(".notification")
+        .should("contain", "A new blog created by Brandon Sanderson!")
+        .and("have.css", "color", "rgb(0, 128, 0)")
+      cy.contains("Mistborn");
+    })
+  })
 })

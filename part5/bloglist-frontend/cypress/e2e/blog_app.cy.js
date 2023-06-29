@@ -62,5 +62,15 @@ describe('Blog app', function() {
         .and("have.css", "color", "rgb(0, 128, 0)")
       cy.contains("Mistborn");
     })
+
+    describe("A note exists", function () {
+      beforeEach(function () {
+        cy.createBlog({ title: "Mistborn", author: "Brandon Sanderson", url: "http://FictionalSanderson.com", likes: "5000" });
+      })
+
+      it("user can like a blog", function () {
+        cy.contains("view").click();
+      })
+    })
   })
 })

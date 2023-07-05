@@ -70,6 +70,10 @@ describe('Blog app', function() {
 
       it("user can like a blog", function () {
         cy.contains("view").click();
+        cy.get(".blogLikeButton").click();
+        cy.get(".notification")
+        .should("contain", `Successfully updated blog "Mistborn"!`)
+        .and("have.css", "color", "rgb(0, 128, 0)")
       })
     })
   })

@@ -150,7 +150,7 @@ const App = () => {
     }
 
     return (
-        <div>
+        <div className="blogContainer">
             <Notification message={notification} errorOccured={errorOccured}/>
             { user === null ? loginForm()
                 :

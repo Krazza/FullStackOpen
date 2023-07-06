@@ -63,7 +63,7 @@ describe('Blog app', function() {
       cy.contains("Mistborn");
     })
 
-    describe("A note exists", function () {
+    describe("A blog exists", function () {
       beforeEach(function () {
         cy.createBlog({ title: "Mistborn", author: "Brandon Sanderson", url: "http://FictionalSanderson.com", likes: "5000" });
       })
@@ -73,6 +73,18 @@ describe('Blog app', function() {
         cy.get(".blogLikeButton").click();
         cy.get(".notification")
         .should("contain", `Successfully updated blog "Mistborn"!`)
+        .and("have.css", "color", "rgb(0, 128, 0)")
+      })
+
+      it("creator of a blog can delete it", function () {
+        cy.contains("Kevin is logged in");
+        cy.contains("view").click();
+        cy.contains("Added by: Kevin");
+        cy.contains("remove").click();
+        cy.get(".blogContainer")
+          .should("not.contain", "Mistborn");
+          cy.get(".notification")
+        .should("contain", `Successfully removed a blog`)
         .and("have.css", "color", "rgb(0, 128, 0)")
       })
     })

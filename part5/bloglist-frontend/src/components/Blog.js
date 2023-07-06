@@ -56,7 +56,7 @@ const Blog = ({ blog, updateBlog, removeBlog, owner }) => {
     }
 
     return(
-        <div style={blogStyle}>
+        <div style={blogStyle} className={blog.title}>
             {showDetails ?
                 <div >
                     <h4 style={inlineStyle} className="blogTitle">{blog.title}</h4>{showDetails && <button className="blogHideButton" style={buttonStyle} onClick={handleToggle}>{"hide"}</button>}

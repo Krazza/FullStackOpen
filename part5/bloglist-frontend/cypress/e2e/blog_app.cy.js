@@ -6,7 +6,14 @@ describe('Blog app', function() {
       username: 'kev',
       password: 'kappa123'
     }
+
+    const anotherUser = {
+      name: 'Joe',
+      username: 'joe',
+      password: 'kappa123'
+    }
     cy.request('POST', 'http://localhost:3003/api/users/', user) 
+    cy.request('POST', 'http://localhost:3003/api/users/', anotherUser) 
   })
   
   it('login form is displayed by default', function() {
@@ -86,6 +93,29 @@ describe('Blog app', function() {
           cy.get(".notification")
         .should("contain", `Successfully removed a blog`)
         .and("have.css", "color", "rgb(0, 128, 0)")
+      })
+
+      it(`only the creator sees the "remove" button`, function () {
+        cy.contains("Kevin is logged in");
+        cy.contains("view").click();
+        cy.contains("Added by: Kevin");
+        cy.contains("remove");
+
+        cy.contains("log out").click();;
+
+        cy.contains("Log in");
+        cy.get("#userName").type("joe");
+        cy.get("#password").type("kappa123");
+        cy.get("#loginButton").click();
+
+        cy.get(".notification")
+          .should("contain", "Welcome Joe!")
+          .and("have.css", "color", "rgb(0, 128, 0)");
+        
+        cy.contains("view").click();
+
+        cy.get(".Mistborn")
+          .should("not.contain", "remove");
       })
     })
   })

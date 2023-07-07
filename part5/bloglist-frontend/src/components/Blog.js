@@ -56,22 +56,24 @@ const Blog = ({ blog, updateBlog, removeBlog, owner }) => {
     }
 
     return(
-        <div style={blogStyle} className={blog.title}>
-            {showDetails ?
-                <div >
-                    <h4 style={inlineStyle} className="blogTitle">{blog.title}</h4>{showDetails && <button className="blogHideButton" style={buttonStyle} onClick={handleToggle}>{"hide"}</button>}
-                    <p className="blogAuthorExpanded">{"AUTHOR : "}{blog.author}</p>
-                    <p className="blogUrl">{"URL : "}{blog.url}</p>
-                    <p className="blogLikes" style={inlineStyle}>{"LIKES : "}{blog.likes}</p><button className="blogLikeButton" style={buttonStyle} onClick={handleLike}>{"like"}</button>
-                    <p className="blogEditor">{`Added by: ${blog.user.name}`}</p>
-                </div>
-                :
-                <div>
-                    <h4 style={inlineStyle} className="blogTitle">{blog.title}</h4>
-                    <p style={inlineStyle} className="blogAuthorCollapsed">{` by ${blog.author}`}</p>
-                    {!showDetails && <button className="blogExpandButton" style={buttonStyle} onClick={handleToggle}>{"view"}</button>}
-                </div>}
-            {(blog.user.name === owner) && <button className="blogRemoveButton" onClick={handleRemoval}>{"remove"}</button>}
+        <div className="blog">
+            <div style={blogStyle} className={blog.title}>
+                {showDetails ?
+                    <div >
+                        <h4 style={inlineStyle} className="blogTitle">{blog.title}</h4>{showDetails && <button className="blogHideButton" style={buttonStyle} onClick={handleToggle}>{"hide"}</button>}
+                        <p className="blogAuthorExpanded">{"AUTHOR : "}{blog.author}</p>
+                        <p className="blogUrl">{"URL : "}{blog.url}</p>
+                        <p className="blogLikes" style={inlineStyle}>{"LIKES : "}{blog.likes}</p><button className="blogLikeButton" style={buttonStyle} onClick={handleLike}>{"like"}</button>
+                        <p className="blogEditor">{`Added by: ${blog.user.name}`}</p>
+                    </div>
+                    :
+                    <div>
+                        <h4 style={inlineStyle} className="blogTitle">{blog.title}</h4>
+                        <p style={inlineStyle} className="blogAuthorCollapsed">{` by ${blog.author}`}</p>
+                        {!showDetails && <button className="blogExpandButton" style={buttonStyle} onClick={handleToggle}>{"view"}</button>}
+                    </div>}
+                {(blog.user.name === owner) && <button className="blogRemoveButton" onClick={handleRemoval}>{"remove"}</button>}
+            </div>
         </div>)
 }
 

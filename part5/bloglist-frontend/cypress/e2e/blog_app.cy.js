@@ -118,5 +118,17 @@ describe('Blog app', function() {
           .should("not.contain", "remove");
       })
     })
+    describe("Multiple blogs exist", function () {
+      beforeEach(function () {
+        cy.createBlog({ title: "Mistborn", author: "Brandon Sanderson", url: "http://FictionalSanderson.com", likes: "1" });
+        cy.createBlog({ title: "The Dark Tower", author: "Stephen King", url: "http://FictionalKing.com", likes: "5" });
+        cy.createBlog({ title: "The Martian", author: "Andy Weir", url: "http://FictionalWeir.com", likes: "6" });
+      })
+      it("blogs are ordered by likes", function () {
+        cy.get(".blog").eq(0).should("contain", "The Martian");
+        cy.get(".blog").eq(1).should("contain", "The Dark Tower");
+        cy.get(".blog").eq(2).should("contain", "Mistborn");
+      })
+    })
   })
 })

@@ -1,14 +1,14 @@
-import React from "react";
-import "@testing-library/jest-dom/extend-expect";
-import { render, screen } from "@testing-library/react";
-import  userEvent from "@testing-library/user-event";
-import Blog from "./Blog";
+import React from "react"
+import "@testing-library/jest-dom/extend-expect"
+import { render, screen } from "@testing-library/react"
+import  userEvent from "@testing-library/user-event"
+import Blog from "./Blog"
 
 describe("<Blog />", () => {
 
-    let container;
-    const updateBlog = jest.fn(); 
-    const removeBlog = jest.fn();
+    let container
+    const updateBlog = jest.fn()
+    const removeBlog = jest.fn()
     const blog = {
         title : "learning react testing library",
         author : "Facebook",
@@ -18,8 +18,8 @@ describe("<Blog />", () => {
             id : "6491de2320b4c0c9250ac429",
             name : "test"
         }
-    };
-    const owner = "Kevin";
+    }
+    const owner = "Kevin"
 
     beforeEach(() => {
         container = render(
@@ -28,35 +28,35 @@ describe("<Blog />", () => {
     })
 
     test("blog's title and author are being rendered", () => {
-        const blogTitle = screen.getByText("learning react testing library");
-        const blogAuthor = screen.getByText("Facebook" , { exact : false });
+        const blogTitle = screen.getByText("learning react testing library")
+        const blogAuthor = screen.getByText("Facebook" , { exact : false })
 
-        const blogUrl = screen.queryByText("www.Facebook.com");
-        const blogLikes = screen.queryByText(2235);
-        expect(blogUrl).toBeNull();
-        expect(blogLikes).toBeNull();
+        const blogUrl = screen.queryByText("www.Facebook.com")
+        const blogLikes = screen.queryByText(2235)
+        expect(blogUrl).toBeNull()
+        expect(blogLikes).toBeNull()
     })
 
     test("showing likes and url after clicking the button", async () => {
-        const user = userEvent.setup();
-        const button = container.querySelector(".blogExpandButton");
+        const user = userEvent.setup()
+        const button = container.querySelector(".blogExpandButton")
 
-        await user.click(button);
+        await user.click(button)
 
-        const blogUrl = screen.getByText("www.Facebook.com" , { exact : false });
-        const blogLikes = screen.getByText(2235 , { exact : false });
+        const blogUrl = screen.getByText("www.Facebook.com" , { exact : false })
+        const blogLikes = screen.getByText(2235 , { exact : false })
 
     })
 
     test("clicking like button twice calls event handler twice", async () => {
-        const user = userEvent.setup();
-        const expandButton = container.querySelector(".blogExpandButton");
-        await user.click(expandButton);
+        const user = userEvent.setup()
+        const expandButton = container.querySelector(".blogExpandButton")
+        await user.click(expandButton)
 
-        const likeButton = screen.getByText("like");
-        await user.dblClick(likeButton);
+        const likeButton = screen.getByText("like")
+        await user.dblClick(likeButton)
 
-        expect(updateBlog.mock.calls).toHaveLength(2);
+        expect(updateBlog.mock.calls).toHaveLength(2)
     })
 })
 

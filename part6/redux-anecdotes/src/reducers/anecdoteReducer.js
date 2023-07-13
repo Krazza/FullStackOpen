@@ -33,10 +33,7 @@ export const voteAnecdote = (id) => {
   }
 }
 
-const reducer = (state = initialState, action) => {
-  console.log('state now: ', state)
-  console.log('action', action)
-
+export const anecdoteReducer = (state = initialState, action) => {
   switch(action.type){
     case "NEW_ANECDOTE":
       return [...state, action.payload];
@@ -50,4 +47,5 @@ const reducer = (state = initialState, action) => {
   }
 }
 
-export default reducer
+
+
